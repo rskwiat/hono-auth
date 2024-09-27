@@ -1,7 +1,7 @@
 import { Context, HonoRequest } from "hono";
 import bycrpt from 'bcrypt';
 import UserModel from "../models/usersModel";
-import { Jwt } from "hono/utils/jwt";
+import { sign } from "hono/jwt";
 import dotenv from 'dotenv';
 import { setCookie } from "hono/cookie";
 
@@ -57,12 +57,16 @@ export const loginUser = async (c: Context) => {
   if (user) {
     const match = await bycrpt.compare(password, user.password);
     if (match) {
-      const token = await Jwt.sign({ ...user, exp: Date.now() + 30 }, process.env.SECRET!);
-      setCookie(c, 'auth', token)
-      return c.json({ 'status': 'ok' }, 200);
+
+      const payload = {
+        sub: user,
+        exp: Math.floor(Date.now() / 1000) + 60 * 5, // Token expires in 5 minutes
+      }
+
+      const token = await sign(payload, process.env.SECRET!);
+      setCookie(c, 'auth', token);
+      return c.json({ 'status': 'ok', token }, 200);
     }
-
-
   } else {
     return await c.json({ 'error': 'User does not exist.' })
   }

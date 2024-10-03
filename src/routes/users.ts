@@ -1,5 +1,14 @@
 import { Hono } from 'hono';
-import { getUsers, createUser, deleteUser, getUserById, loginUser } from '../handlers/users';
+import {
+  getUsers,
+  createUser,
+  deleteUser,
+  getUserById,
+  loginUser,
+  updatePassword,
+  resetPassword
+} from '../handlers/users';
+
 const users = new Hono();
 
 users.get('/', getUsers) // get all users
@@ -9,10 +18,11 @@ users.get('/:id', getUserById);
 users.post('/register', createUser);
 // POST /users/remove Delete User
 users.post('/remove', deleteUser);
+//post /users/reset-password
+users.post('/reset-password', resetPassword);
+//Post /users/update-password
+users.post('/update-password', updatePassword);
 
-// POST /users/login, get JWT back
 users.post('/login', loginUser);
-
-
 
 export default users;

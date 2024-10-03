@@ -16,6 +16,9 @@ app.use(logger());
 app.route('/users', users);
 app.use('/auth/*', authCookie);
 app.route('/auth', auth);
+app.get('/*', (c) => {
+  return c.notFound()
+});
 
 console.log(`Server is running on port ${PORT}`)
 

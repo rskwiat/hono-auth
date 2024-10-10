@@ -1,28 +1,13 @@
-import { serve } from '@hono/node-server'
-import { Hono } from 'hono'
-import { users, auth } from './routes';
-import connectDB from '../lib/database'
-import { logger } from 'hono/logger'
-import dotenv from 'dotenv';
-import { authCookie } from './middlewares/authCookie';
+import { serve } from "@hono/node-server";
+// import dotenv from "dotenv";
 
-const PORT = process.env.PORT!
-const app = new Hono()
+import env from "@/env";
 
-dotenv.config();
+import app from "./app";
 
-connectDB();
-app.use(logger());
-app.route('/users', users);
-app.use('/auth/*', authCookie);
-app.route('/auth', auth);
-app.get('/*', (c) => {
-  return c.notFound()
-});
-
-console.log(`Server is running on port ${PORT}`)
+console.log(`Server is running on port ${env.PORT}`);
 
 serve({
   fetch: app.fetch,
-  port: Number(PORT),
+  port: env.PORT,
 });

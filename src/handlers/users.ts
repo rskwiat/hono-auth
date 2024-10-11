@@ -8,56 +8,6 @@ import { Resend } from "resend";
 
 import env from "@/env";
 
-import UserModel from "../models/usersModel";
-
-dotenv.config();
-
-export async function getUsers(c: Context) {
-  const data = await UserModel.find();
-  return c.json(data);
-}
-
-export async function getUserById(c: Context) {
-  const id = c.req.param("id");
-  const data = await UserModel.findOne({ _id: id });
-  return c.json(data);
-}
-
-export async function createUser(c: Context) {
-  const { email, password } = await c.req.json();
-  const salt = await bcrypt.genSalt(10);
-
-  const lowerCaseEmail = email.toLowerCase();
-  const hashedPassword = await bcrypt.hash(password, salt);
-
-  const newUser = new UserModel({
-    email: lowerCaseEmail,
-    password: hashedPassword,
-  });
-
-  const data = await UserModel.findOne({ email: newUser.email });
-
-  if (data) {
-    return await c.json(data);
-  }
-  else {
-    const res = await newUser.save();
-    return await c.json(res);
-  }
-}
-
-export async function deleteUser(c: Context) {
-  const { id } = await c.req.json();
-  const data = await UserModel.findOne({ _id: id });
-
-  if (data) {
-    return await UserModel.deleteOne({ _id: id });
-  }
-  else {
-    return await c.json({ error: `${id} does not exist.` });
-  }
-}
-
 export async function loginUser(c: Context) {
   const { email, password } = await c.req.json();
   const lowerCaseEmail = email.toLowerCase();

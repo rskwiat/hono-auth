@@ -1,26 +1,28 @@
-import { OpenAPIHono } from "@hono/zod-openapi";
-import { logger } from "hono/logger";
-
-import type { AppBindings } from "@/lib/types";
-
 import connectDB from "@/db/database";
+import index from "@/routes/index.routes";
+import users from "@/routes/users/users.index";
 
 import { OK } from "./constants/http-status-codes";
 import { ACCEPTED } from "./constants/http-status-phrases";
+import configureOpenApi from "./lib/configure-open-api";
+import createApp from "./lib/create-app";
 import { authCookie } from "./middlewares/authCookie";
-import notFound from "./middlewares/not-found";
-import onError from "./middlewares/on-error";
-import pinoLogger from "./middlewares/pino-logger";
-import { auth, users } from "./routes";
-// const PORT = process.env.PORT!;
-const app = new OpenAPIHono<AppBindings>({
-  strict: false,
+
+connectDB();
+
+const app = createApp();
+
+const routes = [
+  index,
+  users,
+];
+
+configureOpenApi(app);
+routes.forEach((route) => {
+  app.route("/", route);
 });
 
-// dotenv.config();
-
 // connectDB();
-app.use(pinoLogger());
 // app.route("/users", users);
 // app.use("/auth/*", authCookie);
 // app.route("/auth", auth);
@@ -31,12 +33,5 @@ app.use(pinoLogger());
 app.get("/healthcheck", async (c) => {
   return c.json({ message: ACCEPTED }, OK);
 });
-
-app.get("/error", () => {
-  throw new Error("not nice");
-});
-
-app.notFound(notFound);
-app.onError(onError);
 
 export default app;

@@ -1,4 +1,4 @@
-import type { OpenAPIHono, RouteConfig, RouteHandler } from "@hono/zod-openapi";
+import type { OpenAPIHono, RouteConfig, RouteHandler, z } from "@hono/zod-openapi";
 import type { PinoLogger } from "hono-pino";
 
 export interface AppBindings {
@@ -10,3 +10,7 @@ export interface AppBindings {
 export type AppOpenAPI = OpenAPIHono<AppBindings>;
 
 export type AppRouteHandler<R extends RouteConfig> = RouteHandler<R, AppBindings>;
+
+// eslint-disable-next-line ts/ban-ts-comment
+// @ts-expect-error
+export type ZodSchema = z.ZodUnion | z.AnyZodObject | z.ZodArray<z.AnyZodObject>;
